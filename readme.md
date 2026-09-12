@@ -1,5 +1,17 @@
 # AI-Powered VSCode Code Analyzer — Spring Boot Extension Guide
 
+A modern, production-grade developer tool demonstrating the integration of enterprise Java backends with state-of-the-art Large Language Models. This project bridges intelligent code analysis directly into the IDE workflow, serving as a blueprint for modern AI-assisted engineering.
+
+
+## Enterprise Highlights & Core Capabilities
+- Flexible AI Provider Architecture: Seamlessly switch between local inference (Ollama) and cloud APIs (OpenAI, Hugging Face) using Spring Profiles without altering business logic.
+- Modern Java Backend: Built on Spring Boot and Spring AI for robust prompt orchestration, externalized configurations, and modular REST endpoints.
+- IDE Productivity Integration: A lightweight TypeScript-based VS Code extension that brings instant, context-aware code reviews, complexity checks, and refactoring insights right to the developer's fingertips.
+- AI-Assisted Engineering ("Vibe Coding"): Accelerated delivery leveraging modern AI-pairing workflows with GitHub Copilot, demonstrating rapid prototyping and high-quality software craftsmanship.
+
+
+
+
 ## Table of Contents
 1. [Project Overview & Architecture Flow](#1-project-overview--architecture-flow)
 2. [System Requirements & Prerequisites](#2-system-requirements--prerequisites)
@@ -96,9 +108,9 @@ To avoid hardcoding prompts and ensure maintainability, configure the applicatio
 * Externalized prompt templates for full analysis, complexity scoring, and refactoring .
 
 ### 3.3 Core Endpoints
-* `POST /api/code/analyze`: Accepts code payload and returns a structured breakdown containing code explanation, errors/problems, an improved version, and a step-by-step dry run .
-* `POST /api/code/complexity`: Evaluates cyclomatic-style complexity score and category .
-* `POST /api/code/refactor-suggestions`: Returns high-impact refactoring suggestions .
+* `POST /api/code/analyze`: Accepts code payload and returns a structured breakdown containing code explanation, errors/problems, an improved version, and a step-by-step dry run.
+* `POST /api/code/complexity`: Evaluates cyclomatic-style complexity score and category. (not implemented yet)
+* `POST /api/code/refactor-suggestions`: Returns high-impact refactoring suggestions. (not implemented yet)
 
 ---
 
@@ -186,7 +198,15 @@ mvn clean test
 
 ### Prompt 3: Create HTTP Testing File
 ```text
-write a few tests in request.http file to test POST /api/code/analyze with different inputs with 2 3 different languages e.e. java, javascript, python, dart
+@workspace
+
+Create a `request.http` file at the root of the project to test the backend REST API. 
+
+Requirements:
+- Target endpoint: `POST http://localhost:8080/api/code/analyze`
+- Headers: `Content-Type: application/json`
+- Include at least 3 distinct test requests covering different programming languages (e.g., Java, Python, and JavaScript/Dart).
+- Each request body must provide valid JSON containing both `code` (a realistic code snippet) and `language` fields matching the expected `CodeRequest` DTO structure.
 ```
 
 ### Prompt 4: Create VSCode Extension
