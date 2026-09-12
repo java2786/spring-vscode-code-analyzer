@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:8080
+
+### Analyze Java code
+POST {{baseUrl}}/api/code/analyze
+Content-Type: application/json
+
+{
+	"language": "java",
+	"code": "public int sum(int first, int second) {\n    return first + second;\n}"
+}
+
+### Analyze JavaScript code
+POST {{baseUrl}}/api/code/analyze
+Content-Type: application/json
+
+{
+	"language": "javascript",
+	"code": "function calculateTotal(price, quantity) {\n  let total = 0;\n  for (let index = 0; index < quantity; index++) {\n    total += price;\n  }\n  return total;\n}"
+}
+
+### Analyze Python code
+POST {{baseUrl}}/api/code/analyze
+Content-Type: application/json
+
+{
+	"language": "python",
+	"code": "def find_even_numbers(numbers):\n    return [number for number in numbers if number % 2 == 0]"
+}
+
+### Analyze Dart code
+POST {{baseUrl}}/api/code/analyze
+Content-Type: application/json
+
+{
+	"language": "dart",
+	"code": "int factorial(int number) {\n  if (number <= 1) return 1;\n  return number * factorial(number - 1);\n}"
+}
+
+### Reject blank source code
+POST {{baseUrl}}/api/code/analyze
+Content-Type: application/json
+
+{
+	"language": "java",
+	"code": ""
+}

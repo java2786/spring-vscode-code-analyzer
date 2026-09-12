@@ -1,0 +1,34 @@
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Java and Maven build output
+target/
+*.class
+*.jar
+*.war
+
+# Maven and Java tooling
+.mvn/timing.properties
+.releaseBackup
+.flattened-pom.xml
+
+# Node.js and VS Code extension artifacts
+node_modules/
+out/
+*.vsix
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
