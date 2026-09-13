@@ -1,0 +1,51 @@
+{
+  "name": "ai-code-anayser",
+  "displayName": "AI Code Analyzer",
+  "description": "Analyze selected code using a local LLM through Ollama",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeAnalyzer.analyze",
+        "title": "Analyze Selected Code 2"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codeAnalyzer.analyze",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "webpack --mode production",
+    "watch": "webpack --watch --mode development"
+  },
+  "dependencies": {
+    "axios": "^1.20.0"
+  },
+"devDependencies": {
+    "@types/vscode": "^1.137.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "typescript-eslint": "^8.61.1",
+    "eslint": "^10.5.0",
+    "typescript": "^6.0.3",
+    "ts-loader": "^9.6.2",
+    "webpack": "^5.107.2",
+    "webpack-cli": "^7.0.3",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0"
+  }
+}

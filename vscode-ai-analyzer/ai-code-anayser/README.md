@@ -1,0 +1,269 @@
+# AI Code Analyzer for VS Code
+
+This project is a custom VS Code extension that sends selected source code to a local Ollama model and saves the analysis as a Markdown file.
+
+The extension workflow is:
+
+1. Select code in a VS Code editor.
+2. Right-click the selection.
+3. Choose **Analyze Selected Code 2**.
+4. The extension sends the selected code to Ollama at `http://localhost:11434/api/generate`.
+5. The response is parsed into four sections and saved as `code-analysis-result.md` in the first open workspace folder.
+6. VS Code opens the generated Markdown file automatically.
+
+## Current Architecture
+
+```text
+Selected code in VS Code
+        |
+        v
+src/extension.ts
+        |
+        | HTTP POST using Axios
+        v
+Ollama at localhost:11434
+        |
+        v
+codellama:7b
+        |
+        v
+src/formatMarkdownResponse.ts
+        |
+        v
+code-analysis-result.md
+```
+
+The extension communicates directly with Ollama. A Spring Boot service is not required for this project.
+
+## Prerequisites
+
+Install the following software:
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Node.js](https://nodejs.org/) LTS and npm
+- [Ollama](https://ollama.com/), or Docker Desktop to run Ollama in a container
+- A downloaded Ollama model named `codellama:7b`
+
+Verify the local tools:
+
+```bash
+node --version
+npm --version
+ollama --version
+```
+
+## Set Up Ollama
+
+### Option A: Ollama installed locally
+
+Start Ollama, then download the model:
+
+```bash
+ollama serve
+ollama pull codellama:7b
+ollama list
+```
+
+Keep `ollama serve` running while using the extension. If Ollama is already running as a desktop application, do not start a second server.
+
+### Option B: Ollama in Docker
+
+Use Docker Desktop and run:
+
+```bash
+docker pull ollama/ollama
+
+docker run -d \
+  --name ollama \
+  -v ollama:/root/.ollama \
+  -p 11434:11434 \
+  ollama/ollama
+
+docker exec -it ollama ollama pull codellama:7b
+docker exec -it ollama ollama list
+```
+
+The named volume keeps downloaded models when the container is recreated. Manage the container with:
+
+```bash
+docker stop ollama
+docker start ollama
+docker logs ollama
+```
+
+Both setup options must expose Ollama at `http://localhost:11434`, which is the URL currently configured in `src/extension.ts`.
+
+## Test Ollama Before Building
+
+Confirm that the API responds before troubleshooting the extension:
+
+```bash
+curl http://localhost:11434/api/generate \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "codellama:7b",
+    "prompt": "what is AtomicInteger in java?",
+    "stream": false
+  }'
+```
+
+The response should be JSON containing a generated `response` field. The extension uses that field as the analysis text.
+
+To check that the configured model is installed:
+
+```bash
+curl --fail --silent http://localhost:11434/api/tags
+```
+
+If `codellama:7b` is not listed, run `ollama pull codellama:7b` or the equivalent Docker command above.
+
+## Install Project Dependencies
+
+Open the project root in VS Code. It is the directory containing `package.json`, then run:
+
+```bash
+npm install
+```
+
+The project uses TypeScript, webpack, `ts-loader`, the VS Code Extension API, and Axios.
+
+## Build the Extension
+
+Create the production bundle with:
+
+```bash
+npm run compile
+```
+
+Webpack writes the extension entrypoint to:
+
+```text
+dist/extension.js
+```
+
+This path matches the `main` value in `package.json`. Do not edit files inside `dist`; they are generated build output.
+
+For continuous development builds, run:
+
+```bash
+npm run watch
+```
+
+Leave this command running while developing. It rebuilds `dist/extension.js` when TypeScript files change.
+
+## Run the Extension in VS Code
+
+1. Open the project root in VS Code.
+2. Start Ollama and confirm that `codellama:7b` is available.
+3. Run `npm install` once if dependencies are not installed.
+4. Press `F5`, or open **Run and Debug** and select **Run Extension**.
+5. A new Extension Development Host window opens.
+6. Open a source file and select one or more lines.
+7. Right-click the selection and choose **Analyze Selected Code 2**.
+
+The command is available only when text is selected. Its contribution is defined in `package.json` with the `editorHasSelection` condition.
+
+## Response Format
+
+The prompt in `src/extension.ts` asks Ollama to return exactly these sections:
+
+```text
+1. Explanation:
+2. Errors / Problems:
+3. Improved Version:
+4. Dry Run:
+```
+
+`parseSections` extracts those sections. `formatAndSaveMarkdownResponse` writes them as:
+
+```text
+<first workspace folder>/code-analysis-result.md
+```
+
+The generated file contains these Markdown headings:
+
+- Explanation
+- Issues / Missing Parts
+- Corrected Code
+- Dry Run
+
+## Project Structure
+
+```text
+ai-code-anayser/
+|-- package.json
+|-- tsconfig.json
+|-- webpack.config.js
+|-- README.md
+|-- .vscode/
+|   |-- launch.json
+|   |-- tasks.json
+|   `-- settings.json
+|-- src/
+|   |-- extension.ts
+|   |-- formatMarkdownResponse.ts
+|   `-- test/
+|       `-- extension.test.ts
+`-- dist/                    generated by npm run compile
+    `-- extension.js
+```
+
+### Important files
+
+- `package.json` declares the extension command, context-menu entry, dependencies, and build scripts.
+- `src/extension.ts` registers the command, reads the selection, calls Ollama, and parses the response.
+- `src/formatMarkdownResponse.ts` creates and opens `code-analysis-result.md`.
+- `webpack.config.js` bundles the TypeScript entrypoint into `dist/extension.js`.
+- `.vscode/launch.json` launches the Extension Development Host and uses the default build task.
+
+## Troubleshooting
+
+### "Unable to connect to Ollama"
+
+Check that the API is reachable:
+
+```bash
+curl http://localhost:11434/api/tags
+```
+
+Start Ollama or the Docker container, then retry the command.
+
+### The model is missing
+
+Install the configured model:
+
+```bash
+ollama pull codellama:7b
+```
+
+For Docker:
+
+```bash
+docker exec -it ollama ollama pull codellama:7b
+```
+
+### The command is not shown
+
+Make sure that:
+
+- Code is selected in an editor.
+- The Extension Development Host is running the current project.
+- `npm run compile` completed successfully.
+- The right-click menu item is **Analyze Selected Code 2**.
+
+### `dist/extension.js` is missing
+
+Run:
+
+```bash
+npm run compile
+```
+
+The extension manifest loads `./dist/extension.js`, so the webpack build must complete before launching the extension.
+
+## Limitations
+
+- The Ollama URL and model name are currently hardcoded in `src/extension.ts`.
+- The extension expects the response headings requested by its prompt.
+- The generated Markdown is written to the first workspace folder, or the current directory when no workspace is open.
+- The analysis is generated by an LLM and should be checked with a compiler, tests, or other appropriate tools.
