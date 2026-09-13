@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/code")
@@ -18,8 +19,9 @@ public class CodeAnalysisController {
         this.codeAnalysisService = codeAnalysisService;
     }
 
-    @PostMapping("/analyze")
+    @PostMapping(value = "/analyze", produces = MediaType.APPLICATION_JSON_VALUE)
     public AnalysisResponse analyze(@RequestBody CodeRequest request) {
+        System.out.println("Received request: " + request);
         return codeAnalysisService.analyzeCode(request);
     }
 }

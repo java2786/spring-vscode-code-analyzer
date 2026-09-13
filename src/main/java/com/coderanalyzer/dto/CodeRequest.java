@@ -19,4 +19,11 @@ public class CodeRequest {
     public void setLanguage(String language) {
         this.language = language;
     }
+
+    @Override
+    public String toString() {
+        return "CodeRequest [code=" + code + ", language=" + language + "]";
+    }
+
+    
 }

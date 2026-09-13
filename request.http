@@ -44,3 +44,19 @@ Content-Type: application/json
 	"language": "java",
 	"code": ""
 }
+
+
+###
+
+
+POST http://localhost:11434/api/generate
+Content-Type: application/json
+
+{
+  "model": "codellama:7b",
+  "prompt": "what is AtomicInteger in java?",
+  "stream": false
+}
+
+###
+

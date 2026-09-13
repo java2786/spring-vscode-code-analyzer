@@ -47,4 +47,11 @@ public class AnalysisResponse {
     public void setDryRun(String dryRun) {
         this.dryRun = dryRun;
     }
+
+    @Override
+    public String toString() {
+        return "AnalysisResponse [explanation=" + explanation + ", errors=" + errors + ", improvedVersion="
+                + improvedVersion + ", dryRun=" + dryRun + "]";
+    }
+    
 }
